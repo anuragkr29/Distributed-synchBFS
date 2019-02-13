@@ -15,6 +15,7 @@ class Round {
         return stopAllThreads.get();
     }
 
+
     public Round(int number) {
         round = new AtomicIntegerArray(number);
     }

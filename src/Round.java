@@ -3,7 +3,7 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 
 class Round {
     public static AtomicIntegerArray round ;
-    private AtomicInteger threadCount ;
+    private AtomicInteger threadCount = new AtomicInteger(0);
 
     public Round(int number) {
         round = new AtomicIntegerArray(number);

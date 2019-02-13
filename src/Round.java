@@ -1,14 +1,27 @@
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 class Round {
-    private static AtomicInteger round = new AtomicInteger(0);
+    public static AtomicIntegerArray round ;
+    private AtomicInteger threadCount ;
 
-    public static int nextRound() {
-        return round.incrementAndGet();
+    public Round(int number) {
+        round = new AtomicIntegerArray(number);
     }
 
-    public int value() {
-        return this.round.get();
+    public  void nextRound(int number) {
+        this.threadCount.set(number);
+        for(int i=0; i<number;i++){
+            round.set(i,100);
+        }
+    }
+
+    public static int update(int index, int updatedValue) {
+        return round.getAndSet(index,updatedValue);
+    }
+
+    public int getVal(int index){
+        return round.get(index);
     }
 
 }

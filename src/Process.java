@@ -9,17 +9,17 @@ class Process implements Runnable{
     private boolean marked;
     private ArrayList<Integer> neighbors;
     private int process_index;
-    private Communication channel;
     private BlockingQueue<Message> queue = new ArrayBlockingQueue<>(10);
 
-    public Process(int UID, boolean is_marked, ArrayList<Integer> neighbors, int process_index, Communication channel) {
+    public Process(int UID, boolean is_marked, ArrayList<Integer> neighbors, int process_index) {
         this.UID = UID;
         this.marked = is_marked;
         this.neighbors = new ArrayList<>(neighbors);
         this.process_index = process_index;
-        this.channel = channel;
     }
-
+    public void putMessage(Message m){
+        queue.add(m);
+    }
     public boolean is_marked() {
         return marked;
     }
@@ -53,9 +53,19 @@ class Process implements Runnable{
     }
     @Override
     public void run(){
-            Thread.currentThread().setName("" + process_index);
-            System.out.println("My UID is : " + UID);
-            System.out.println("Current Thread name : " + Thread.currentThread().getName());
+        while(true)
+        {
+            if(Round.round.get(this.process_index) == 100)
+            {
+                Thread.currentThread().setName("" + process_index);
+                System.out.println("My UID is : " + UID);
+                System.out.println("My Neighbours : " + neighbors);
+                System.out.println("Current Thread name : " + Thread.currentThread().getName());
+                System.out.println("Array before : " + Round.round.get(this.process_index));
+                Round.update(this.process_index,0);
+                System.out.println("Array after : " + Round.round.get(this.process_index));
+            }
+        }
 
     }
 }

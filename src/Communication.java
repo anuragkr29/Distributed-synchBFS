@@ -1,22 +1,15 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Communication {
-    private static ArrayList<Message>[] sharedMessage;
+    public static HashMap<Integer,Process> processUIDMap;
 
-    public Communication(int n) {
-        this.sharedMessage = new ArrayList[n];
+    public Communication(HashMap<Integer,Process> h) {
+        processUIDMap = h;
     }
 
-    public ArrayList<Message> getMessage(int index){
-        return this.sharedMessage[index];
-    }
 
-    public void sendMessage(Message m, int index){
-        if(index >= sharedMessage.length){
-            this.sharedMessage[index] = new ArrayList<Message>();
-        }else{
-            this.sharedMessage[index].add(m);
-        }
-
+    public void sendMessage(Message m, int UID){
+        processUIDMap.get(UID);
     }
 }

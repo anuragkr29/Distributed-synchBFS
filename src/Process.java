@@ -6,16 +6,18 @@ import java.util.concurrent.BlockingQueue;
 class Process implements Runnable{
 
     private int UID;
+    private int rootUID;
     private boolean marked;
     private ArrayList<Integer> neighbors;
     private int process_index;
     private BlockingQueue<Message> queue = new ArrayBlockingQueue<>(10);
 
-    public Process(int UID, boolean is_marked, ArrayList<Integer> neighbors, int process_index) {
+    public Process(int UID, boolean is_marked, ArrayList<Integer> neighbors, int process_index, int rootUID) {
         this.UID = UID;
         this.marked = is_marked;
         this.neighbors = new ArrayList<>(neighbors);
         this.process_index = process_index;
+        this.rootUID = rootUID;
     }
     public void putMessage(Message m){
         queue.add(m);
@@ -62,6 +64,27 @@ class Process implements Runnable{
                 System.out.println("My Neighbours : " + neighbors);
                 System.out.println("Current Thread name : " + Thread.currentThread().getName());
                 System.out.println("Array before : " + Round.round.get(this.process_index));
+
+                try {
+                    while(!this.queue.isEmpty())
+                    {
+                        Message m = this.queue.take();
+                        Message toSend = new Message(false,this.UID,true);
+                        if(m.isRoot())
+                        {
+                            Thread.sleep(1000);
+                            Communication.sendMessage(toSend,this.neighbors);
+                            break;
+                        }
+                        Thread.sleep(1000);
+                        Communication.sendMessage(toSend,this.neighbors);
+                        Thread.sleep(500);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+
                 Round.update(this.process_index,0);
                 System.out.println("Array after : " + Round.round.get(this.process_index));
             }

@@ -24,21 +24,27 @@ public class Main {
         HashMap<Integer,Process> processMap = new HashMap<>(2*numberOfProcesses);
         // submit jobs to be executing by the pool
         for (int i = 0; i < numberOfProcesses; i++) {
-            Process p = new Process(UIDs[i], false , utility.getNeighbors(i,connectionMatrix[i]),i);
+            Process p = new Process(UIDs[i], false , utility.getNeighbors(i,connectionMatrix[i]),i, rootUID);
             processMap.put(UIDs[i],p);
         }
-        Communication channel = new Communication(processMap);
+        Communication channel = new Communication(processMap, UIDs);
         for (int i = 0; i < numberOfProcesses; i++) {
             threadPool.submit(processMap.get(UIDs[i]));
         }
         System.out.println("Waiting for input");
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
-        int round = 2;
-        while (round != 0) {
+        int round = 0;
+        while (round <= 3) {
             try {
                 if (Round.threadCount.get() == 0) {
-                    round--;
+                    round++;
+                    if (round==1){
+                        Process root = processMap.get(rootUID);
+                        Message m = new Message();
+                        m.setRoot(true);
+                        root.putMessage(m);
+                    }
                     r.nextRound(numberOfProcesses);
                     System.out.println("Started round : " + (round + 1));
                 }

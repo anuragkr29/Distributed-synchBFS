@@ -65,6 +65,10 @@ class Process implements Runnable{
                 Round.update(this.process_index,0);
                 System.out.println("Array after : " + Round.round.get(this.process_index));
             }
+            if(Round.getStopAllThreads()){
+                System.out.println("Shutting down UID : " + UID);
+                break;
+            }
         }
 
     }

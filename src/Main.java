@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,7 +15,6 @@ public class Main {
         ReadFile fileReadObj = new ReadFile("input.dat");
         ArrayList<Integer>[] connectionMatrix = fileReadObj.getConnectionMatrix();
         int numberOfProcesses = fileReadObj.getNumberOfProcesses();
-        final Semaphore available = new Semaphore(numberOfProcesses, true);
         int rootUID = fileReadObj.getRoot();
         int[] UIDs = fileReadObj.getUIDs();
         int numCores = Runtime.getRuntime().availableProcessors();
@@ -36,17 +34,28 @@ public class Main {
         System.out.println("Waiting for input");
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
-        while(true){
-            if(inp == 3){
-                r.nextRound(numberOfProcesses);
+        int round = 2;
+        while (round != 0) {
+            try {
+                if (Round.threadCount.get() == 0) {
+                    round--;
+                    r.nextRound(numberOfProcesses);
+                    System.out.println("Started round : " + (round + 1));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            inp = s.nextInt();
-        //threadPool.shutdown();
-        // wait for the threads to finish if necessary
-//        try {
-//            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
+//            inp = s.nextInt();
+        }
+        r.setStopAllThreads(true);
+        System.out.println("All rounds finishied . Closing Thread pool");
+        threadPool.shutdown();
+//wait for the threads to finish if necessary
+        try {
+            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            System.out.println("Thread pool closed");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

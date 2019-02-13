@@ -9,7 +9,12 @@ public class Communication {
     }
 
 
-    public void sendMessage(Message m, int UID){
-        processUIDMap.get(UID);
+    public void sendMessage(Message m, int UID, int[] neighbors){
+        for (int n:neighbors) {
+            Process neighbor = processUIDMap.get(UID);
+
+        }
+
     }
+
 }

@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,18 +31,18 @@ public class Main {
         }
         Communication channel = new Communication(processMap, UIDs);
         for (int i = 0; i < numberOfProcesses; i++) {
-            threadPool.submit(processMap.get(UIDs[i]));
+                threadPool.submit(processMap.get(UIDs[i]));
         }
         System.out.println("Waiting for input");
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
         int round = 0;
-        while (round <= 7) {
+        Process root = processMap.get(rootUID);
+        while (!root.isProcessCompleted()) {
             try {
                 if (Round.threadCount.get() == 0) {
                     round++;
                     if (round==1){
-                        Process root = processMap.get(rootUID);
                         Message m = new Message();
                         m.setRoot(true);
                         m.setRoundNum(1);

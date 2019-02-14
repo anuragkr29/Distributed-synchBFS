@@ -7,6 +7,7 @@ public class Message {
     private int roundNum = 0;
     private boolean reject = false;
     private int level=0;
+    private boolean done = false;
 
     public Message(){}
 
@@ -51,6 +52,14 @@ public class Message {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 
     public boolean isParent() {

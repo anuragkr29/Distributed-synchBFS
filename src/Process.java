@@ -16,6 +16,9 @@ class Process implements Runnable{
     private BlockingQueue<Message> queue = new ArrayBlockingQueue<>(10);
     private int level;
     private boolean leaf = false;
+    private int count = 0;
+    private boolean processCompleted = false;
+    private int doneCount = 0;
 
     public Process(int UID, boolean is_marked, ArrayList<Integer> neighbors, int process_index, int rootUID) {
         this.UID = UID;
@@ -57,6 +60,10 @@ class Process implements Runnable{
         return process_index;
     }
 
+    public boolean isProcessCompleted() {
+        return processCompleted;
+    }
+
     public void setProcess_index(int process_index) {
         this.process_index = process_index;
     }
@@ -72,7 +79,6 @@ class Process implements Runnable{
     public int processQueue(boolean isMyRound){
         // for parent selection
         int maxUIDIndex = -1;
-        int count = 0;
         Message maxUIDMsg = new Message(false,-1,true,-1,Integer.MAX_VALUE);
         ArrayList<Integer> nonParent = new ArrayList<Integer>();
         try {
@@ -83,17 +89,46 @@ class Process implements Runnable{
                     nonParent.add(m.getProcess_index());
                     maxUIDMsg = this.compareParent(maxUIDMsg,m);
                 }
+                else if(m.isSearch() && !isMyRound  && this.marked){
+                    Message rejectMsg = new Message();
+                    rejectMsg.setReject(true);
+                    rejectMsg.setInUID(this.UID);
+                    Communication.sendMessage(rejectMsg,m.getProcess_index());
+                }
                 else if(m.isParent() && !m.isRoot()){
                     this.children.add(m.getProcess_index());
                 }
                 else if(m.isReject()){
                     count++;
-                    System.out.println("Reject msg from : " + m.getInUID() + " to me : " + this.UID);
-                    if(count == this.neighbors.size()+1)
+//                    System.out.println("Reject msg from : " + m.getInUID() + " to me : " + this.UID);
+                    if(count == this.neighbors.size())
+                    {
                         this.leaf = true;
+                        this.sendDone(this.parentIndex);
+                    }
                 }
                 else if(m.isRoot()){
                     return -1;
+                }
+                if(m.isDone()){
+                    this.doneCount++;
+                    if(this.doneCount == this.children.size())
+                    {
+                        if(this.UID == rootUID)
+                        {
+                            System.out.println("queue data for : " + this.UID + " count : " + this.doneCount + " child : " + this.children.size());
+                            Thread.currentThread().sleep(500);
+                            this.processCompleted = true;
+                            System.out.println("Process completed for : " + this.UID);
+                        }
+                        else
+                        {
+                            this.sendDone(this.parentIndex);
+                            Thread.currentThread().sleep(500);
+                            this.processCompleted = true;
+                            System.out.println("Process completed for : " + this.UID);
+                        }
+                    }
                 }
             }
         } catch (InterruptedException e) {
@@ -103,7 +138,7 @@ class Process implements Runnable{
         if(maxUIDIndex != -1){
             this.parentIndex = maxUIDIndex;
             nonParent.remove(nonParent.indexOf(maxUIDIndex));
-            System.out.println(" UID : " + this.UID + " Non Parent : " + nonParent);
+//            System.out.println(" UID : " + this.UID + " Non Parent : " + nonParent);
             this.sendReject(nonParent);
         }
         return maxUIDIndex;
@@ -132,6 +167,18 @@ class Process implements Runnable{
         rejectMsg.setReject(true);
         rejectMsg.setInUID(this.UID);
         Communication.sendMessage(rejectMsg,nonParent);
+    }
+
+    public void sendDone(Integer recipient){
+        Message rejectMsg = new Message();
+        rejectMsg.setDone(true);
+        rejectMsg.setInUID(this.UID);
+        Communication.sendMessage(rejectMsg,recipient);
+        if(this.children.size() == 0)
+        {
+            this.processCompleted = true;
+            System.out.println("Process completed for : " + this.UID);
+        }
     }
     public int selectParent(){
         int maxUIDIndex = -1;
@@ -208,7 +255,7 @@ class Process implements Runnable{
                             parentUID = this.processQueue(true);
                             if(parentUID != -1)
                             {
-                                this.neighbors.remove(this.neighbors.indexOf(parentUID));
+                                //this.neighbors.remove(this.neighbors.indexOf(parentUID));
 //                                System.out.println("updated my neighbors : " + UID + "  Neighbors : "  + this.neighbors);
                                 Message toSend = new Message(true,this.UID,false,this.process_index, this.level);
                                 toSend.setRoundNum(0);
@@ -230,10 +277,11 @@ class Process implements Runnable{
                                 Message toSend = new Message(false,this.UID,true,this.process_index,this.level);
                                 toSend.setRoundNum(globalRoundNum + 1);
                                 Thread.sleep(1000);
+//                                System.out.println("sending Messages to neighbors  " + this.neighbors + "from UID : " + this.UID );
                                 Communication.sendMessage(toSend,this.neighbors);
                                 this.marked = true;
-                                if (parentUID != -1)
-                                    this.neighbors.add(parentUID);
+//                                if (parentUID != -1)
+//                                    this.neighbors.add(parentUID);
 //                                System.out.println("Messages to neighbors  " + this.UID );
 
                         }
@@ -248,7 +296,8 @@ class Process implements Runnable{
             }
 
             if(Round.getStopAllThreads()){
-                System.out.println("Shutting down UID : " + UID + " with children : " + this.children + " with parent : " + this.parentIndex + " is leaf : " + this.leaf);
+                System.out.println("Shutting down UID : " + UID + " with children : " + this.children + " with parent : " + this.parentIndex +
+                        " is leaf : " + this.leaf + " Neighbor size : " + this.neighbors.size() + " reject count : " + count);
 //                System.out.println("My children : " + this.children);
 //                System.out.println("My Parent : " + this.parentIndex);
                 break;

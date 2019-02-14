@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 
 class Round {
     public static AtomicIntegerArray round ;
+    public static AtomicInteger globalRoundNumber = new AtomicInteger(0);
     public static AtomicInteger threadCount= new AtomicInteger(0) ;
     private static AtomicBoolean stopAllThreads = new AtomicBoolean(false);
 
@@ -15,12 +16,12 @@ class Round {
         return stopAllThreads.get();
     }
 
-
     public Round(int number) {
         round = new AtomicIntegerArray(number);
     }
 
-    public  void nextRound(int number) {
+    public  void nextRound(int number, int roundNumber) {
+        globalRoundNumber.set(roundNumber);
         threadCount.set(number);
         for(int i=0; i<number;i++){
             round.set(i,100);
@@ -40,4 +41,8 @@ class Round {
         return threadCount.get();
     }
 
+
+    public static int getGlobalRoundNumber() {
+        return globalRoundNumber.get();
+    }
 }

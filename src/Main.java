@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,23 +26,33 @@ public class Main {
         HashMap<Integer,Process> processMap = new HashMap<>(2*numberOfProcesses);
         // submit jobs to be executing by the pool
         for (int i = 0; i < numberOfProcesses; i++) {
-            Process p = new Process(UIDs[i], false , utility.getNeighbors(i,connectionMatrix[i]),i);
+            Process p = new Process(UIDs[i], false , utility.getNeighbors(i,connectionMatrix[i]),i, rootUID);
             processMap.put(UIDs[i],p);
         }
-        Communication channel = new Communication(processMap);
+        Communication channel = new Communication(processMap, UIDs);
         for (int i = 0; i < numberOfProcesses; i++) {
-            threadPool.submit(processMap.get(UIDs[i]));
+                threadPool.submit(processMap.get(UIDs[i]));
         }
         System.out.println("Waiting for input");
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
-        int round = 2;
-        while (round != 0) {
+        int round = 0;
+        Process root = processMap.get(rootUID);
+        while (!root.isProcessCompleted()) {
             try {
                 if (Round.threadCount.get() == 0) {
-                    round--;
-                    r.nextRound(numberOfProcesses);
-                    System.out.println("Started round : " + (round + 1));
+                    round++;
+                    if (round==1){
+                        Message m = new Message();
+                        m.setRoot(true);
+                        m.setRoundNum(1);
+                        m.setLevel(1);
+                        root.putMessage(m);
+                    }
+                    System.out.println("Waiting for Input");
+                    Thread.currentThread().sleep(1000);
+                    r.nextRound(numberOfProcesses,round);
+                    System.out.println("Started round : " + (round));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

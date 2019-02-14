@@ -35,7 +35,7 @@ public class Main {
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
         int round = 0;
-        while (round <= 3) {
+        while (round <= 4) {
             try {
                 if (Round.threadCount.get() == 0) {
                     round++;
@@ -43,10 +43,13 @@ public class Main {
                         Process root = processMap.get(rootUID);
                         Message m = new Message();
                         m.setRoot(true);
+                        m.setRoundNum(1);
+                        m.setLevel(1);
                         root.putMessage(m);
                     }
-                    r.nextRound(numberOfProcesses);
-                    System.out.println("Started round : " + (round + 1));
+                    s.nextInt();
+                    r.nextRound(numberOfProcesses,round);
+                    System.out.println("Started round : " + (round));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

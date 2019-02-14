@@ -18,7 +18,14 @@ public class Communication {
         }
     }
 
+    // polymorphic sendMessage for a single process communication
+    public static void sendMessage(Message m, Integer neighborIndex){
+            Process neighbor = processUIDMap.get(UIDs[neighborIndex]);
+            send(m,neighbor);
+    }
+
     private static void send(Message m , Process p){
+//        System.out.println("putting message"+ m.getInUID() + " to neighbor : " + p.getUID());
         p.putMessage(m);
     }
 

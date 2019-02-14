@@ -35,7 +35,7 @@ public class Main {
         Scanner s = new Scanner(System.in);
         int inp = s.nextInt();
         int round = 0;
-        while (round <= 4) {
+        while (round <= 7) {
             try {
                 if (Round.threadCount.get() == 0) {
                     round++;
@@ -47,7 +47,8 @@ public class Main {
                         m.setLevel(1);
                         root.putMessage(m);
                     }
-                    s.nextInt();
+                    System.out.println("Waiting for Input");
+                    Thread.currentThread().sleep(1000);
                     r.nextRound(numberOfProcesses,round);
                     System.out.println("Started round : " + (round));
                 }

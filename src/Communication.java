@@ -5,13 +5,13 @@ public class Communication {
     public static HashMap<Integer,Process> processUIDMap;
     private static int[] UIDs;
 
-    public Communication(HashMap<Integer,Process> h, int[] UIDs) {
+    public  Communication(HashMap<Integer,Process> h, int[] UIDs) {
         processUIDMap = h;
         this.UIDs = UIDs;
     }
 
 
-    public static void sendMessage(Message m, ArrayList<Integer> neighbors){
+    public synchronized static void sendMessage(Message m, ArrayList<Integer> neighbors){
         for (int n:neighbors) {
             Process neighbor = processUIDMap.get(UIDs[n]);
             send(m,neighbor);
@@ -19,7 +19,7 @@ public class Communication {
     }
 
     // polymorphic sendMessage for a single process communication
-    public static void sendMessage(Message m, Integer neighborIndex){
+    public synchronized static void sendMessage(Message m, Integer neighborIndex){
             Process neighbor = processUIDMap.get(UIDs[neighborIndex]);
             send(m,neighbor);
     }

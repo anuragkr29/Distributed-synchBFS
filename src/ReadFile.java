@@ -1,9 +1,16 @@
+/**
+ * @author Anurag Kumar
+ */
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class ReadFile {
+    /**
+     * This class helps to read a file (inout.dat) and parse it
+     */
     private ArrayList<String> inputValues;
     private int numberOfProcesses;
     private int[] UIDs;
@@ -31,12 +38,20 @@ public class ReadFile {
 
     private ArrayList<Integer>[] connectionMatrix;
 
+    /**
+     * public function to read a file
+     * @param arg the relative filename to be opened
+     */
     public ReadFile(String arg) {
         inputValues = new ArrayList<>();
         readFile(arg);
     }
 
-    public void readFile(String arg)  {
+    /**
+     * private function to read a file
+     * @param arg the relative filename to be opened
+     */
+    private void readFile(String arg)  {
         File file = new File(arg);
         Scanner sc = null;
         try {
@@ -52,6 +67,11 @@ public class ReadFile {
         init(inputValues);
 
     }
+
+    /**
+     * function to initialize the and populate the array variables
+     * @param values the input string read from the file
+     */
     public void init(ArrayList<String> values) {
         ArrayList<String> inputFile = values;
         Iterator itr = inputFile.iterator();
@@ -73,7 +93,6 @@ public class ReadFile {
                 }
             }
             i++;
-
         }
     }
 }

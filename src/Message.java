@@ -1,3 +1,8 @@
+/**
+ * @author Anurag Kumar
+ */
+
+
 public class Message {
     private boolean parent=false;
     private int inUID;

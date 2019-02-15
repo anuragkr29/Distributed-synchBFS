@@ -1,3 +1,7 @@
+/**
+ * @author Anurag Kumar
+ */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +25,6 @@ public class Main {
         int[] UIDs = fileReadObj.getUIDs();
         int numCores = Runtime.getRuntime().availableProcessors();
         Round r = new Round(numberOfProcesses);
-        System.out.println("Number of Cores : " + numCores);
         ExecutorService threadPool = Executors.newFixedThreadPool(numberOfProcesses);
         HashMap<Integer,Process> processMap = new HashMap<>(2*numberOfProcesses);
         // submit jobs to be executing by the pool
@@ -33,9 +36,7 @@ public class Main {
         for (int i = 0; i < numberOfProcesses; i++) {
                 threadPool.submit(processMap.get(UIDs[i]));
         }
-        System.out.println("Waiting for input");
         Scanner s = new Scanner(System.in);
-        int inp = s.nextInt();
         int round = 0;
         Process root = processMap.get(rootUID);
         while (!root.isProcessCompleted()) {
@@ -49,7 +50,6 @@ public class Main {
                         m.setLevel(1);
                         root.putMessage(m);
                     }
-                    System.out.println("Waiting for Input");
                     Thread.currentThread().sleep(1000);
                     r.nextRound(numberOfProcesses,round);
                     System.out.println("Started round : " + (round));
